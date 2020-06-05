@@ -20,6 +20,8 @@ export default new Vuex.Store({
     createPost (context, post) {
       const postId = 'greatPost' + Math.random()
       post['.key'] = postId
+      post.userId = context.state.authId
+      post.publishedAt = Math.floor(Date.now() / 1000)
 
       context.commit('setPost', {post, postId})
       context.commit('appendPostToThread', {threadId: post.threadId, postId})
