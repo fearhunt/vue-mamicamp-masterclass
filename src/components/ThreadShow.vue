@@ -35,13 +35,11 @@
           type: String
         }
       },
-
       data () {
         return {
           thread: sourceData.threads[this.id],
           posts: sourceData.posts,
-          users: sourceData.users,
-          props: true
+          users: sourceData.users
         }
       }
     }
