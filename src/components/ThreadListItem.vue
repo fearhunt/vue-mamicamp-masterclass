@@ -32,7 +32,6 @@
 </template>
 
 <script>
-  import sourceData from '@/data'
   export default {
     props: {
       thread: {
@@ -47,7 +46,7 @@
       },
 
       user () {
-        return sourceData.users[this.thread.userId]
+        return this.$store.state.users[this.thread.userId]
       }
     }
   }

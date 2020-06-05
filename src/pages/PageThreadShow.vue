@@ -6,12 +6,11 @@
         <span style="float:right; margin-top: 2px;" class="hide-mobile text-faded text-small">3 replies by 3 contributors</span>
       </p>
       <PostList :posts="posts"/>
-      <PostEditor @save="addPost" :threadId="id"/>
+      <PostEditor :threadId="id"/>
     </div>
 </template>
 
 <script>
-    import sourceData from '@/data'
     import PostList from '@/components/PostList'
     import PostEditor from '@/components/PostEditor'
 
@@ -30,24 +29,15 @@
 
       data () {
         return {
-          thread: sourceData.threads[this.id]
+          thread: this.$store.state.threads[this.id]
         }
       },
 
       computed: {
         posts () {
           const postIds = Object.values(this.thread.posts)
-          return Object.values(sourceData.posts)
+          return Object.values(this.$store.state.posts)
             .filter(post => postIds.includes(post['.key']))
-        }
-      },
-
-      methods: {
-        addPost (post) {
-          const postId = post['.key']
-          this.$set(sourceData.posts, postId, post)
-          this.$set(this.thread.posts, postId, postId)
-          this.$set(sourceData.users[post.userId].posts, postId, postId)
         }
       }
     }
