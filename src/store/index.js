@@ -17,29 +17,51 @@ export default new Vuex.Store({
   },
 
   actions: {
-    createPost (context, post) {
+    createPost ({commit, state}, post) {
       const postId = 'greatPost' + Math.random()
       post['.key'] = postId
-      post.userId = context.state.authId
+      post.userId = state.authId
       post.publishedAt = Math.floor(Date.now() / 1000)
 
-      context.commit('setPost', {post, postId})
-      context.commit('appendPostToThread', {threadId: post.threadId, postId})
-      context.commit('appendPostToUser', {userId: post.userId, postId})
+      commit('setPost', {post, postId})
+      commit('appendPostToThread', {threadId: post.threadId, postId})
+      commit('appendPostToUser', {userId: post.userId, postId})
+      return Promise.resolve(state.posts[postId])
     },
 
     createThread ({state, commit, dispatch}, {text, title, forumId}) {
-      const threadId = 'greatThread' + Math.random()
-      const userId = state.authId
-      const publishedAt = Math.floor(Date.now() / 1000)
+      return new Promise((resolve, reject) => {
+        const threadId = 'greatThread' + Math.random()
+        const userId = state.authId
+        const publishedAt = Math.floor(Date.now() / 1000)
 
-      const thread = {'.key': threadId, title, forumId, publishedAt, userId}
+        const thread = {'.key': threadId, title, forumId, publishedAt, userId}
 
-      commit('setThread', {threadId, thread})
-      commit('appendThreadToForum', {forumId, threadId})
-      commit('appendThreadToUser', {userId, threadId})
+        commit('setThread', {threadId, thread})
+        commit('appendThreadToForum', {forumId, threadId})
+        commit('appendThreadToUser', {userId, threadId})
 
-      dispatch('createPost', {text, threadId})
+        dispatch('createPost', {text, threadId})
+          .then(post => {
+            commit('setThread', {threadId, thread: {...thread, firstPostId: post['.key']}})
+          })
+        resolve(state.threads[threadId])
+      })
+    },
+
+    updateThread ({state, commit}, {title, text, id}) {
+      return new Promise((resolve, reject) => {
+        const thread = state.threads[id]
+        const post = state.posts[thread.firstPostId]
+
+        const newThread = {...thread, title}
+        const newPost = {...post, text}
+
+        commit('setThread', {thread: newThread, threadId: id})
+        commit('setPost', {post: newPost, postId: thread.firstPostId})
+
+        resolve(newThread)
+      })
     },
 
     updateUser ({commit}, user) {
@@ -52,12 +74,12 @@ export default new Vuex.Store({
       Vue.set(state.posts, postId, post)
     },
 
-    setThread (state, {thread, threadId}) {
-      Vue.set(state.threads, threadId, thread)
-    },
-
     setUser (state, {user, userId}) {
       Vue.set(state.users, userId, user)
+    },
+
+    setThread (state, {thread, threadId}) {
+      Vue.set(state.threads, threadId, thread)
     },
 
     appendPostToThread (state, {postId, threadId}) {
