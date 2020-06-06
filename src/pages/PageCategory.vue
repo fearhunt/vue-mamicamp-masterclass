@@ -6,6 +6,7 @@
 </template>
 
 <script>
+    import {mapActions} from 'vuex'
     import CategoryListItem from '@/components/CategoryListItem'
     export default {
       components: {
@@ -17,15 +18,18 @@
           type: String
         }
       },
+      methods: {
+        ...mapActions(['fetchCategory', 'fetchForums'])
+      },
       computed: {
         category () {
           return this.$store.state.categories[this.id]
         }
       },
       created () {
-        this.$store.dispatch('fetchCategory', {id: this.id})
+        this.fetchCategory({id: this.id})
           .then(category => {
-            this.$store.dispatch('fetchForums', {ids: category.forums})
+            this.fetchForums({ids: category.forums})
           })
       }
     }
