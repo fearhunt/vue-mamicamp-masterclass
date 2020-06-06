@@ -21,11 +21,12 @@
       },
       mixins: [asyncDataStatus],
       methods: {
-        ...mapActions(['fetchCategory', 'fetchForums'])
+        ...mapActions('categories', ['fetchCategory']),
+        ...mapActions('forums', ['fetchForums'])
       },
       computed: {
         category () {
-          return this.$store.state.categories[this.id]
+          return this.$store.state.categories.items[this.id]
         }
       },
       created () {
