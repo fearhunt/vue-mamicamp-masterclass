@@ -47,12 +47,12 @@
           email: this.form.email,
           password: this.form.password
         })
-          .then(() => this.succesRedirect())
+          .then(() => this.successRedirect())
           .catch(error => alert('[oh no!]' + error.message))
       },
       signInWithGoogle () {
         this.$store.dispatch('signInWithGoogle')
-          .then(() => this.succesRedirect())
+          .then(() => this.successRedirect())
           .catch(error => alert('🤷‍️' + error.message))
       },
       successRedirect () {
