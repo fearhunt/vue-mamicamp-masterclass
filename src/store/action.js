@@ -164,6 +164,26 @@ export default {
     })
   },
 
+  initAuthentication ({dispatch, commit, state}) {
+    return new Promise((resolve, reject) => {
+      // unsubscribe observer if already listening
+      if (state.unsubscribeAuthObserver) {
+        state.unsubscribeAuthObserver()
+      }
+
+      const unsubscribe = firebase.auth().onAuthStateChanged(user => {
+        console.log('[whoops!] the user has changed')
+        if (user) {
+          dispatch('fetchAuthUser')
+            .then(dbUser => resolve(dbUser))
+        } else {
+          resolve(null)
+        }
+      })
+      commit('setUnsubscribeAuthObserver', unsubscribe)
+    })
+  },
+
   fetchCategory ({dispatch}, {id}) {
     return dispatch('fetchItem', {resource: 'categories', id, emoji: 'category -->'})
   },
