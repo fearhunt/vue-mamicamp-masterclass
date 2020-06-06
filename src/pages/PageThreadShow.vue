@@ -15,9 +15,7 @@
       <span style="float:right; margin-top: 2px;" class="hide-mobile text-faded text-small">{{repliesCount}} replies by {{contributorsCount}} contributors</span>
     </p>
     <PostList :posts="posts"></PostList>
-    <PostEditor
-      :threadId = "id"
-    ></PostEditor>
+    <PostEditor :threadId = "id"/>
   </div>
 </template>
 
