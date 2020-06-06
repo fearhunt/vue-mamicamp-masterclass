@@ -6,6 +6,7 @@ import router from './router'
 import firebase from 'firebase'
 import AppDate from '@/components/AppDate'
 import store from '@/store'
+
 Vue.component('AppDate', AppDate)
 
 Vue.config.productionTip = false
