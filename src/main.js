@@ -21,6 +21,7 @@ const firebaseConfig = {
   appId: process.env.FIREBASE_APP_ID
 }
 firebase.initializeApp(firebaseConfig)
+console.log(process.env, process.env.PORT)
 
 firebase.auth().onAuthStateChanged(user => {
   if (user) {
