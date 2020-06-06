@@ -11,15 +11,15 @@ export default {
   },
 
   getters: {
-    threadRepliesCount: state => id => countObjectProperties(state.threads[id].posts) - 1
+    threadRepliesCount: state => id => countObjectProperties(state.items[id].posts) - 1
   },
 
   actions: {
-    createThread ({state, commit, dispatch}, {text, title, forumId}) {
+    createThread ({state, commit, dispatch, rootState}, {text, title, forumId}) {
       return new Promise((resolve, reject) => {
         const threadId = firebase.database().ref('threads').push().key
         const postId = firebase.database().ref('posts').push().key
-        const userId = state.authId
+        const userId = rootState.auth.authId
         const publishedAt = Math.floor(Date.now() / 1000)
 
         const thread = {title, forumId, publishedAt, userId, firstPostId: postId, posts: {}}
@@ -36,28 +36,27 @@ export default {
         firebase.database().ref().update(updates)
           .then(() => {
             // update thread
-            commit('setItem', {resource: 'threads', id: threadId, item: thread})
-            commit('appendThreadToForum', {parentId: forumId, childId: threadId})
-            commit('appendThreadToUser', {parentId: userId, childId: threadId})
+            commit('setItem', {resource: 'threads', id: threadId, item: thread}, {root: true})
+            commit('forums/appendThreadToForum', {parentId: forumId, childId: threadId}, {root: true})
+            commit('users/appendThreadToUser', {parentId: userId, childId: threadId}, {root: true})
             // update post
-            commit('setItem', {resource: 'posts', item: post, id: postId})
+            commit('setItem', {resource: 'posts', item: post, id: postId}, {root: true})
             commit('appendPostToThread', {parentId: post.threadId, childId: postId})
-            commit('appendPostToUser', {parentId: post.userId, childId: postId})
+            commit('users/appendPostToUser', {parentId: post.userId, childId: postId}, {root: true})
 
-            resolve(state.threads[threadId])
+            resolve(state.items[threadId])
           })
       })
     },
 
-    updateThread ({state, commit, dispatch}, {title, text, id}) {
+    updateThread ({state, commit, dispatch, rootState}, {title, text, id}) {
       return new Promise((resolve, reject) => {
-        const thread = state.threads[id]
-
+        const thread = state.items[id]
         const post = rootState.posts.items[thread.firstPostId]
 
         const edited = {
           at: Math.floor(Date.now() / 1000),
-          by: state.authId
+          by: rootState.auth.authId
         }
 
         const updates = {}
@@ -68,28 +67,20 @@ export default {
         firebase.database().ref().update(updates)
           .then(() => {
             commit('setThread', {thread: {...thread, title}, threadId: id})
-            commit('setPost', {postId: thread.firstPostId, post: {...post, text, edited}})
+            commit('posts/setPost', {postId: thread.firstPostId, post: {...post, text, edited}}, {root: true})
             resolve(post)
           })
       })
     },
-
-    fetchThread ({dispatch}, {id}) {
-      return dispatch('fetchItem', {resource: 'threads', id, emoji: 'doc -->'})
-    },
-
-    fetchThreads (context, {ids}) {
-      return context.dispatch('fetchItems', {resource: 'threads', ids, emoji: 'threads -->'})
-    }
+    fetchThread: ({dispatch}, {id}) => dispatch('fetchItem', {resource: 'threads', id, emoji: '📄'}, {root: true}),
+    fetchThreads: ({dispatch}, {ids}) => dispatch('fetchItems', {resource: 'threads', ids, emoji: '🌧'}, {root: true})
   },
-
   mutations: {
     setThread (state, {thread, threadId}) {
-      Vue.set(state.threads, threadId, thread)
+      Vue.set(state.items, threadId, thread)
     },
 
     appendPostToThread: makeAppendChildToParentMutation({parent: 'threads', child: 'posts'}),
-
     appendContributorToThread: makeAppendChildToParentMutation({parent: 'threads', child: 'contributors'})
   }
 }
