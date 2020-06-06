@@ -43,38 +43,32 @@
 </template>
 
 <script>
-    export default {
-      data () {
-        return {
-          form: {
-            name: null,
-            username: null,
-            email: null,
-            password: null,
-            avatar: null
-          }
-        }
-      },
-      methods: {
-        register () {
-          this.$store.dispatch('registerUserWithEmailAndPassword', this.form)
-            .then(() => this.successRedirect())
-        },
-
-        registerWithGoogle () {
-          this.$store.dispatch('signInWithGoogle')
-            .then(() => this.successRedirect())
-        },
-
-        successRedirect () {
-          const redirectTo = this.$route.query.redirectTo || {name: 'Home'}
-          this.$router.push(redirectTo)
-        }
-      },
-      created () {
-        this.$emit('ready')
+export default {
+  data () {
+    return {
+      form: {
+        name: null,
+        username: null,
+        email: null,
+        password: null,
+        avatar: null
       }
     }
+  },
+  methods: {
+    register () {
+      this.$store.dispatch('registerUserWithEmailAndPassword', this.form)
+        .then(() => this.$router.push('/'))
+    },
+    registerWithGoogle () {
+      this.$store.dispatch('signInWithGoogle')
+        .then(() => this.$router.push('/'))
+    }
+  },
+  created () {
+    this.$emit('ready')
+  }
+}
 </script>
 
 <style scoped>

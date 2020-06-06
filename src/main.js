@@ -21,6 +21,12 @@ const firebaseConfig = {
   appId: process.env.FIREBASE_APP_ID
 }
 firebase.initializeApp(firebaseConfig)
+
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    store.dispatch('fetchAuthUser')
+  }
+})
 // console.log(firebaseConfig)
 
 /* eslint-disable no-new */
