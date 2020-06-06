@@ -109,10 +109,10 @@ router.beforeEach((to, from, next) => {
     .then(user => {
       if (to.matched.some(route => route.meta.requiresAuth)) {
         // protected route
-        if (store.state.authId) {
+        if (user) {
           next()
         } else {
-          next({name: 'SignIn'})
+          next({name: 'SignIn', query: {redirectTo: to.path}})
         }
       } else if (to.matched.some(route => route.meta.requiresGuest)) {
         // protected route
